@@ -1,0 +1,25 @@
+{
+    "name": "itohin/gendiff",
+    "description": "CLI PHP package",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Anton Tomin",
+            "email": "tohinst@yandex.ru"
+        }
+    ],
+    "bin": [
+        "bin/gendiff"
+    ],
+    "autoload": {
+        "psr-4": {
+            "Gendiff\\": "src"
+        },
+        "files": [
+            "src/Cli.php"
+        ]
+    },
+    "require": {
+        "docopt/docopt": "^1.0"
+    }
+}
