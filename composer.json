@@ -11,6 +11,9 @@
     "bin": [
         "bin/gendiff"
     ],
+    "scripts": {
+        "phpcs": "phpcs"
+    },
     "autoload": {
         "psr-4": {
             "Gendiff\\": "src"
@@ -20,6 +23,7 @@
         ]
     },
     "require": {
-        "docopt/docopt": "^1.0"
+        "docopt/docopt": "^1.0",
+        "squizlabs/php_codesniffer": "^3.4"
     }
 }
