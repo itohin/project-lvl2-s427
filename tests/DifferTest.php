@@ -74,5 +74,4 @@ EOL;
         $this->assertIsString($actual);
         $this->assertEquals($expected, $actual);
     }
-
 }
