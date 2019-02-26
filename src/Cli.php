@@ -1,13 +1,18 @@
 <?php
 
-namespace Gendiff;
+namespace Gendiff\Cli;
 
 use Docopt;
+use function Gendiff\Differ\genDiff;
 
 function run($doc)
 {
     $args = Docopt::handle($doc);
-    foreach ($args as $k => $v) {
-        echo $k . ': ' . json_encode($v) . PHP_EOL;
-    }
+
+    $firstFile = $args['<firstFile>'];
+    $secondFile = $args['<secondFile>'];
+
+    $diff = genDiff($firstFile, $secondFile);
+
+    print_r($diff);
 }
