@@ -9,7 +9,7 @@ use function Gendiff\Differ\getDataFromFile;
 class DifferTest extends TestCase
 {
     /** @test */
-    function it_can_get_data_from_file()
+    public function testDataFromFile()
     {
         $json = '{
           "host": "hexlet.io",
@@ -26,7 +26,7 @@ class DifferTest extends TestCase
     }
 
     /** @test */
-    function get_difference_from_files()
+    public function testDiffFromFiles()
     {
 
         $expected = <<<EOL
