@@ -12,7 +12,8 @@
         "bin/gendiff"
     ],
     "scripts": {
-        "phpcs": "phpcs"
+        "phpcs": "phpcs",
+        "phpunit": "phpunit"
     },
     "autoload": {
         "psr-4": {
