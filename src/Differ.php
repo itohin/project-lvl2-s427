@@ -1,49 +1,63 @@
 <?php
 
 namespace Gendiff\Differ;
-
-use Symfony\Component\Yaml\Yaml;
+use function Gendiff\Parser\parse;
 
 function genDiff($firstFile, $secondFile)
 {
-    $dataBefore = getDataFromFile($firstFile);
-    $dataAfter = getDataFromFile($secondFile);
+    $dataBefore = parse($firstFile);
+    $dataAfter = parse($secondFile);
 
     $keys = array_keys(array_merge($dataBefore, $dataAfter));
 
-    $result = array_reduce($keys, function ($acc, $key) use ($dataBefore, $dataAfter) {
+    $diffData = array_reduce($keys, function ($acc, $key) use ($dataBefore, $dataAfter) {
         if (array_key_exists($key, $dataBefore) && array_key_exists($key, $dataAfter)) {
             if ($dataBefore[$key] === $dataAfter[$key]) {
-                $acc['  ' . $key] = $dataBefore[$key];
+                $acc[] = ['status' => 'unchanged', 'key' => $key, 'value' => $dataBefore[$key]];
             } else {
-                $acc['+ ' . $key] =  $dataAfter[$key];
-                $acc['- ' . $key] = $dataBefore[$key];
+                $acc[] =  ['status' => 'added', 'key' => $key, 'value' => $dataAfter[$key]];
+                $acc[] = ['status' => 'deleted', 'key' => $key, 'value' => $dataBefore[$key]];
             }
         }
 
         if (!array_key_exists($key, $dataAfter)) {
-            $acc['- ' . $key] = $dataBefore[$key];
+            $acc[] = ['status' => 'deleted', 'key' => $key, 'value' => $dataBefore[$key]];
         }
 
         if (!array_key_exists($key, $dataBefore)) {
-            $acc['+ ' . $key] =  $dataAfter[$key];
+            $acc[] =  ['status' => 'added', 'key' => $key, 'value' => $dataAfter[$key]];
         }
 
         return $acc;
     }, []);
 
-    return json_encode($result, JSON_PRETTY_PRINT);
+    $output = makeOutput($diffData);
+
+    return $output;
 }
 
-function getDataFromFile($file)
+function makeOutput($data)
 {
-    $extention = pathinfo($file, PATHINFO_EXTENSION);
+    $result = array_reduce($data, function ($acc, $item) {
+        if (is_bool($item['value'])) {
+            $item['value'] = true ? 'true' : 'false';
+        }
+        switch ($item['status']) {
+            case 'unchanged':
+                $acc .= "    {$item['key']}: {$item['value']}" . PHP_EOL;
+                break;
+            case 'added':
+                $acc .= "  + {$item['key']}: {$item['value']}" . PHP_EOL;
+                break;
+            case 'deleted':
+                $acc .= "  - {$item['key']}: {$item['value']}" . PHP_EOL;
+                break;
+        }
 
-    if ($extention === 'json') {
-        $data = json_decode(file_get_contents($file), true);
-    } elseif ($extention === 'yml') {
-        $data = Yaml::parse(file_get_contents($file));
-    }
+        return $acc;
+    }, '');
 
-    return $data;
+    $output = '{' . PHP_EOL . $result . '}';
+
+    return $output;
 }
