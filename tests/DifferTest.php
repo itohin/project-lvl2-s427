@@ -5,11 +5,12 @@ namespace Gendiff\Tests;
 use function Gendiff\Differ\genDiff;
 use PHPUnit\Framework\TestCase;
 use function Gendiff\Differ\getDataFromFile;
+use Symfony\Component\Yaml\Yaml;
 
 class DifferTest extends TestCase
 {
     /** @test */
-    public function testDataFromFile()
+    public function getDataFromJsonFile()
     {
         $json = '{
           "host": "hexlet.io",
@@ -22,6 +23,24 @@ class DifferTest extends TestCase
         $actual = getDataFromFile($file);
 
         $this->assertIsArray($actual);
+        $this->assertEquals($expected, $actual);
+    }
+
+    /** @test */
+    public function getDataFromYamlFile()
+    {
+
+        $yml = <<<EOL
+host: hexlet.io
+timeout: 50
+proxy: 123.234.53.22
+EOL;
+        $file = __DIR__ . '/testsData/before.yml';
+
+        $expected = Yaml::parse($yml);
+        $actual = getDataFromFile($file);
+
+        $this->assertIsArray($expected);
         $this->assertEquals($expected, $actual);
     }
 
@@ -39,7 +58,6 @@ class DifferTest extends TestCase
 }
 EOL;
 
-
         $before = __DIR__ . '/testsData/before.json';
         $after = __DIR__ . '/testsData/after.json';
 
@@ -47,5 +65,14 @@ EOL;
 
         $this->assertIsString($actual);
         $this->assertEquals($expected, $actual);
+
+        $before = __DIR__ . '/testsData/before.yml';
+        $after = __DIR__ . '/testsData/after.yml';
+
+        $actual = genDiff($before, $after);
+
+        $this->assertIsString($actual);
+        $this->assertEquals($expected, $actual);
     }
+
 }

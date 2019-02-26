@@ -2,11 +2,13 @@
 
 namespace Gendiff\Differ;
 
+use Symfony\Component\Yaml\Yaml;
+
 function genDiff($firstFile, $secondFile)
 {
     $dataBefore = getDataFromFile($firstFile);
     $dataAfter = getDataFromFile($secondFile);
-    
+
     $keys = array_keys(array_merge($dataBefore, $dataAfter));
 
     $result = array_reduce($keys, function ($acc, $key) use ($dataBefore, $dataAfter) {
@@ -29,13 +31,21 @@ function genDiff($firstFile, $secondFile)
 
         return $acc;
     }, []);
-    
+
     return json_encode($result, JSON_PRETTY_PRINT);
 }
 
 function getDataFromFile($file)
 {
-    if (file_exists($file)) {
-        return json_decode(file_get_contents($file), true);
+    $extention = pathinfo($file, PATHINFO_EXTENSION);
+
+    if ($extention === 'json') {
+        $data = json_decode(file_get_contents($file), true);
+    } elseif ($extention === 'yml') {
+        $data = Yaml::parse(file_get_contents($file));
     }
+
+    return $data;
 }
+
+
