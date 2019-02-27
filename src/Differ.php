@@ -1,63 +1,71 @@
 <?php
 
 namespace Gendiff\Differ;
-use function Gendiff\Parser\parse;
+use function Gendiff\Parser\getData;
 
-function genDiff($firstFile, $secondFile)
+function genDiff($firstFilePath, $secondFilePath)
 {
-    $dataBefore = parse($firstFile);
-    $dataAfter = parse($secondFile);
+    $dataBefore = getData($firstFilePath);
+    $dataAfter = getData($secondFilePath);
 
-    $keys = array_keys(array_merge($dataBefore, $dataAfter));
-
-    $diffData = array_reduce($keys, function ($acc, $key) use ($dataBefore, $dataAfter) {
-        if (array_key_exists($key, $dataBefore) && array_key_exists($key, $dataAfter)) {
-            if ($dataBefore[$key] === $dataAfter[$key]) {
-                $acc[] = ['status' => 'unchanged', 'key' => $key, 'value' => $dataBefore[$key]];
-            } else {
-                $acc[] =  ['status' => 'added', 'key' => $key, 'value' => $dataAfter[$key]];
-                $acc[] = ['status' => 'deleted', 'key' => $key, 'value' => $dataBefore[$key]];
-            }
-        }
-
-        if (!array_key_exists($key, $dataAfter)) {
-            $acc[] = ['status' => 'deleted', 'key' => $key, 'value' => $dataBefore[$key]];
-        }
-
-        if (!array_key_exists($key, $dataBefore)) {
-            $acc[] =  ['status' => 'added', 'key' => $key, 'value' => $dataAfter[$key]];
-        }
-
-        return $acc;
-    }, []);
-
-    $output = makeOutput($diffData);
+    $ast = createAst($dataBefore, $dataAfter);
+    $output = makeOutput($ast);
 
     return $output;
 }
 
-function makeOutput($data)
+function createAst($dataBefore, $dataAfter)
 {
-    $result = array_reduce($data, function ($acc, $item) {
+    $keys = array_unique(array_merge(array_keys($dataBefore), array_keys($dataAfter)));
+    return array_reduce($keys, function ($acc, $key) use ($dataBefore, $dataAfter) {
+        $firstValue = isset($dataBefore[$key]) ? $dataBefore[$key] : null;
+        $secondValue = isset($dataAfter[$key]) ? $dataAfter[$key] : null;
+
+        if (array_key_exists($key, $dataBefore) && array_key_exists($key, $dataAfter)) {
+            if (is_array($firstValue) && is_array($secondValue)) {
+                $acc[] = ['status' => 'data', 'key' => $key, 'value' => genDiff($firstValue, $secondValue)];
+            } elseif ($firstValue === $secondValue) {
+                $acc[] = ['status' => 'unchanged', 'key' => $key, 'value' => $firstValue];
+            } else {
+                $acc[] =  ['status' => 'added', 'key' => $key, 'value' => $secondValue];
+                $acc[] = ['status' => 'deleted', 'key' => $key, 'value' => $firstValue];
+            }
+        }
+
+        if (!array_key_exists($key, $dataAfter)) {
+            $acc[] = ['status' => 'deleted', 'key' => $key, 'value' => $firstValue];
+        }
+
+        if (!array_key_exists($key, $dataBefore)) {
+            $acc[] =  ['status' => 'added', 'key' => $key, 'value' => $secondValue];
+        }
+
+        return $acc;
+    }, []);
+}
+
+function makeOutput($ast)
+{
+    $data = array_reduce($ast, function ($acc, $item) {
         if (is_bool($item['value'])) {
             $item['value'] = true ? 'true' : 'false';
         }
         switch ($item['status']) {
             case 'unchanged':
-                $acc .= "    {$item['key']}: {$item['value']}" . PHP_EOL;
-                break;
-            case 'added':
-                $acc .= "  + {$item['key']}: {$item['value']}" . PHP_EOL;
+                $acc[] = "    {$item['key']}: {$item['value']}";
                 break;
             case 'deleted':
-                $acc .= "  - {$item['key']}: {$item['value']}" . PHP_EOL;
+                $acc[] = "  - {$item['key']}: {$item['value']}";
+                break;
+            case 'added':
+                $acc[] = "  + {$item['key']}: {$item['value']}";
                 break;
         }
 
         return $acc;
-    }, '');
+    }, []);
 
-    $output = '{' . PHP_EOL . $result . '}';
+    $output = "{" . PHP_EOL . implode(PHP_EOL, $data) .  PHP_EOL . "}";
 
     return $output;
 }
