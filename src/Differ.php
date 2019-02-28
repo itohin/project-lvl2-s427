@@ -23,49 +23,86 @@ function createAst($dataBefore, $dataAfter)
 
         if (array_key_exists($key, $dataBefore) && array_key_exists($key, $dataAfter)) {
             if (is_array($firstValue) && is_array($secondValue)) {
-                $acc[] = ['status' => 'data', 'key' => $key, 'value' => genDiff($firstValue, $secondValue)];
-            } elseif ($firstValue === $secondValue) {
-                $acc[] = ['status' => 'unchanged', 'key' => $key, 'value' => $firstValue];
+                $acc[] = createNode('data', $key, $firstValue, null, createAst($firstValue, $secondValue));
+            } elseif (is_array($firstValue) || is_array($secondValue)) {
+                $acc[] = createNode('unchanged', $key, $firstValue, $secondValue);
             } else {
-                $acc[] =  ['status' => 'added', 'key' => $key, 'value' => $secondValue];
-                $acc[] = ['status' => 'deleted', 'key' => $key, 'value' => $firstValue];
+                if ($firstValue == $secondValue) {
+                    $acc[] = createNode('unchanged', $key, $firstValue, null);
+                } else {
+                    $acc[] = createNode('changed', $key, $firstValue, $secondValue);
+                }
+            }
+        } else {
+            if (array_key_exists($key, $dataBefore)) {
+                $acc[] = createNode('removed', $key, $firstValue, null);
+            } else {
+                $acc[] = createNode('added', $key, null, $secondValue);
             }
         }
-
-        if (!array_key_exists($key, $dataAfter)) {
-            $acc[] = ['status' => 'deleted', 'key' => $key, 'value' => $firstValue];
-        }
-
-        if (!array_key_exists($key, $dataBefore)) {
-            $acc[] =  ['status' => 'added', 'key' => $key, 'value' => $secondValue];
-        }
-
         return $acc;
     }, []);
 }
 
-function makeOutput($ast)
+function createNode($status, $key, $oldValue, $newValue, $data = null)
 {
-    $data = array_reduce($ast, function ($acc, $item) {
-        if (is_bool($item['value'])) {
-            $item['value'] = true ? 'true' : 'false';
-        }
-        switch ($item['status']) {
+    $node = [
+        'status' => $status,
+        'key' => $key,
+        'oldValue' => is_bool($oldValue) ? var_export($oldValue, 1) : $oldValue,
+        'newValue' => is_bool($newValue) ? var_export($newValue, 1) : $newValue,
+        'data' => $data
+    ];
+
+    return $node;
+}
+
+function makeOutput($data, $indentSize = 0)
+{
+    $indent = str_repeat('    ', $indentSize);
+
+    $result = array_map(function ($node) use ($indent, $indentSize) {
+
+        $status = $node['status'];
+        $key = $node['key'];
+        $oldValue = $node['oldValue'];
+        $newValue = $node['newValue'];
+        $data = $node['data'];
+
+        switch ($status) {
             case 'unchanged':
-                $acc[] = "    {$item['key']}: {$item['value']}";
+                return  $indent . '    ' . $key . ': ' . dataToString($oldValue, $indent);
                 break;
-            case 'deleted':
-                $acc[] = "  - {$item['key']}: {$item['value']}";
+            case 'changed':
+                return $indent . '  + ' . $key . ': ' . dataToString($newValue, $indent) . PHP_EOL .
+                    $indent . '  - ' . $key . ': ' . dataToString($oldValue, $indent);
+                break;
+            case 'removed':
+                return $indent . '  - ' . $key . ': ' . dataToString($oldValue, $indent);
                 break;
             case 'added':
-                $acc[] = "  + {$item['key']}: {$item['value']}";
+                return $indent . '  + ' . $key . ': ' . dataToString($newValue, $indent);
+                break;
+            case 'data':
+                return $indent . '    ' . $key . ': ' . makeOutput($data, $indentSize + 1);
                 break;
         }
+    }, $data);
+    $output = implode(PHP_EOL, $result) . PHP_EOL;
+    return '{' . PHP_EOL . $output . $indent . '}';
+}
 
-        return $acc;
-    }, []);
-
-    $output = "{" . PHP_EOL . implode(PHP_EOL, $data) .  PHP_EOL . "}";
-
-    return $output;
+function dataToString($data, $indent)
+{
+    if (is_array($data)) {
+        $keys = array_keys($data);
+        $result = array_reduce($keys, function ($acc, $key) use ($data, $indent) {
+            $acc[] = '        ' . $indent . $key . ': ' . $data[$key];
+            return $acc;
+        }, []);
+        $string = implode(PHP_EOL, $result) . PHP_EOL;
+        return '{' . PHP_EOL . $string . $indent . '    }';
+    } else {
+        return $data;
+    }
 }

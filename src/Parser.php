@@ -5,21 +5,21 @@ use Symfony\Component\Yaml\Yaml;
 
 function getData($filepath)
 {
-    $fileType = pathinfo($filepath, PATHINFO_EXTENSION);
+    $type = pathinfo($filepath, PATHINFO_EXTENSION);
     $data = file_get_contents($filepath);
 
-    $parser = parse($fileType);
+    $parser = parser($type);
 
     return $parser($data);
 }
 
-function parse($fileType)
+function parser($type)
 {
-    if ($fileType === 'json') {
+    if ($type === 'json') {
         return function ($data) {
             return json_decode($data, true);
         };
-    } elseif ($fileType === 'yml') {
+    } elseif ($type === 'yml') {
         return function ($data) {
             return Yaml::parse($data);
         };
