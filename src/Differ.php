@@ -2,14 +2,15 @@
 
 namespace Gendiff\Differ;
 use function Gendiff\Parser\getData;
+use function Gendiff\Renderers\render;
 
-function genDiff($firstFilePath, $secondFilePath)
+function genDiff($firstFilePath, $secondFilePath, $format)
 {
     $dataBefore = getData($firstFilePath);
     $dataAfter = getData($secondFilePath);
 
     $ast = createAst($dataBefore, $dataAfter);
-    $output = makeOutput($ast);
+    $output = render($ast, $format);
 
     return $output;
 }

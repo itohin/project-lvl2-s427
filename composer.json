@@ -22,7 +22,10 @@
         "files": [
             "src/Cli.php",
             "src/Differ.php",
-            "src/Parser.php"
+            "src/Parser.php",
+            "src/Renderers/Render.php",
+            "src/Renderers/PrettyRender.php",
+            "src/Renderers/PlainRender.php"
         ]
     },
     "require": {

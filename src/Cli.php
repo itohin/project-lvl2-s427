@@ -11,8 +11,9 @@ function run($doc)
 
     $firstFile = $args['<firstFile>'];
     $secondFile = $args['<secondFile>'];
+    $format = $args['--format'];
 
-    $diff = genDiff($firstFile, $secondFile);
+    $diff = genDiff($firstFile, $secondFile, $format);
 
     print_r($diff);
 }
