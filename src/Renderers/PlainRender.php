@@ -24,7 +24,7 @@ function plainRender($data, $parent = null)
             case 'added':
                 return "Property {$fullKey} was added with value: '{$newValue}'";
                 break;
-            case 'children':
+            case 'node':
                 return plainRender($children, $key);
                 break;
         }

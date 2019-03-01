@@ -24,7 +24,7 @@ function createAst($dataBefore, $dataAfter)
 
         if (array_key_exists($key, $dataBefore) && array_key_exists($key, $dataAfter)) {
             if (is_array($firstValue) && is_array($secondValue)) {
-                $acc[] = createNode('children', $key, $firstValue, null, createAst($firstValue, $secondValue));
+                $acc[] = createNode('node', $key, $firstValue, null, createAst($firstValue, $secondValue));
             } elseif (is_array($firstValue) || is_array($secondValue)) {
                 $acc[] = createNode('unchanged', $key, $firstValue, $secondValue);
             } else {

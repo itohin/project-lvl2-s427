@@ -28,7 +28,7 @@ function prettyRender($ast, $indentSize = 0)
             case 'added':
                 return $indent . '  + ' . $key . ': ' . dataToString($newValue, $indent);
                 break;
-            case 'children':
+            case 'node':
                 return $indent . '    ' . $key . ': ' . prettyRender($children, $indentSize + 1);
                 break;
         }
