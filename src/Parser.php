@@ -8,20 +8,26 @@ function getData($filepath)
     $type = pathinfo($filepath, PATHINFO_EXTENSION);
     $data = file_get_contents($filepath);
 
-    $parser = parser($type);
+    $parser = parser($type, $data);
 
-    return $parser($data);
+    return $parser;
 }
 
-function parser($type)
+function parseJson($data)
+{
+    return json_decode($data, true);
+}
+
+function parseYaml($data)
+{
+    return Yaml::parse($data);
+}
+
+function parser($type, $data)
 {
     if ($type === 'json') {
-        return function ($data) {
-            return json_decode($data, true);
-        };
+        return parseJson($data);
     } elseif ($type === 'yml') {
-        return function ($data) {
-            return Yaml::parse($data);
-        };
+        return parseYaml($data);
     }
 }

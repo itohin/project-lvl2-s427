@@ -24,7 +24,7 @@ function createAst($dataBefore, $dataAfter)
 
         if (array_key_exists($key, $dataBefore) && array_key_exists($key, $dataAfter)) {
             if (is_array($firstValue) && is_array($secondValue)) {
-                $acc[] = createNode('data', $key, $firstValue, null, createAst($firstValue, $secondValue));
+                $acc[] = createNode('children', $key, $firstValue, null, createAst($firstValue, $secondValue));
             } elseif (is_array($firstValue) || is_array($secondValue)) {
                 $acc[] = createNode('unchanged', $key, $firstValue, $secondValue);
             } else {
@@ -45,14 +45,14 @@ function createAst($dataBefore, $dataAfter)
     }, []);
 }
 
-function createNode($status, $key, $oldValue, $newValue, $data = null)
+function createNode($type, $key, $oldValue, $newValue, $children = null)
 {
     $node = [
-        'status' => $status,
+        'type' => $type,
         'key' => $key,
-        'oldValue' => is_bool($oldValue) ? var_export($oldValue, 1) : $oldValue,
-        'newValue' => is_bool($newValue) ? var_export($newValue, 1) : $newValue,
-        'data' => $data
+        'oldValue' => $oldValue,
+        'newValue' => $newValue,
+        'children' => $children
     ];
 
     return $node;

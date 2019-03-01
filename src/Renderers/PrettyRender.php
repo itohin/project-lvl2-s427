@@ -8,13 +8,13 @@ function prettyRender($ast, $indentSize = 0)
 
     $result = array_map(function ($node) use ($indent, $indentSize) {
 
-        $status = $node['status'];
+        $type = $node['type'];
         $key = $node['key'];
-        $oldValue = $node['oldValue'];
-        $newValue = $node['newValue'];
-        $data = $node['data'];
+        $oldValue = is_bool($node['oldValue']) ? var_export($node['oldValue'], 1) : $node['oldValue'];
+        $newValue = is_bool($node['newValue']) ? var_export($node['newValue'], 1) : $node['newValue'];
+        $children = $node['children'];
 
-        switch ($status) {
+        switch ($type) {
             case 'unchanged':
                 return  $indent . '    ' . $key . ': ' . dataToString($oldValue, $indent);
                 break;
@@ -28,8 +28,8 @@ function prettyRender($ast, $indentSize = 0)
             case 'added':
                 return $indent . '  + ' . $key . ': ' . dataToString($newValue, $indent);
                 break;
-            case 'data':
-                return $indent . '    ' . $key . ': ' . prettyRender($data, $indentSize + 1);
+            case 'children':
+                return $indent . '    ' . $key . ': ' . prettyRender($children, $indentSize + 1);
                 break;
         }
     }, $ast);
