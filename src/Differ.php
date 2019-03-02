@@ -24,32 +24,32 @@ function createAst($dataBefore, $dataAfter)
 
         if (array_key_exists($key, $dataBefore) && array_key_exists($key, $dataAfter)) {
             if (is_array($firstValue) && is_array($secondValue)) {
-                $acc[] = createNode('node', $key, $firstValue, null, createAst($firstValue, $secondValue));
+                $acc[] = createNode($key, 'node', null, null, createAst($firstValue, $secondValue));
             } elseif (is_array($firstValue) || is_array($secondValue)) {
-                $acc[] = createNode('unchanged', $key, $firstValue, $secondValue);
+                $acc[] = createNode($key, 'unchanged', $firstValue, $secondValue);
             } else {
                 if ($firstValue == $secondValue) {
-                    $acc[] = createNode('unchanged', $key, $firstValue, null);
+                    $acc[] = createNode($key, 'unchanged', $firstValue, null);
                 } else {
-                    $acc[] = createNode('changed', $key, $firstValue, $secondValue);
+                    $acc[] = createNode($key, 'changed', $firstValue, $secondValue);
                 }
             }
         } else {
             if (array_key_exists($key, $dataBefore)) {
-                $acc[] = createNode('removed', $key, $firstValue, null);
+                $acc[] = createNode($key, 'removed', $firstValue, null);
             } else {
-                $acc[] = createNode('added', $key, null, $secondValue);
+                $acc[] = createNode($key, 'added', null, $secondValue);
             }
         }
         return $acc;
     }, []);
 }
 
-function createNode($type, $key, $oldValue, $newValue, $children = null)
+function createNode($key, $type, $oldValue, $newValue, $children = null)
 {
     $node = [
-        'type' => $type,
         'key' => $key,
+        'type' => $type,
         'oldValue' => $oldValue,
         'newValue' => $newValue,
         'children' => $children

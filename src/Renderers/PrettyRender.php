@@ -2,11 +2,11 @@
 
 namespace Gendiff\Renderers;
 
-function prettyRender($ast, $indentSize = 0)
+function prettyRender($ast, $depth = 0)
 {
-    $indent = str_repeat('    ', $indentSize);
+    $indent = str_repeat('    ', $depth);
 
-    $result = array_map(function ($node) use ($indent, $indentSize) {
+    $result = array_map(function ($node) use ($indent, $depth) {
 
         $type = $node['type'];
         $key = $node['key'];
@@ -29,7 +29,7 @@ function prettyRender($ast, $indentSize = 0)
                 return $indent . '  + ' . $key . ': ' . dataToString($newValue, $indent);
                 break;
             case 'node':
-                return $indent . '    ' . $key . ': ' . prettyRender($children, $indentSize + 1);
+                return $indent . '    ' . $key . ': ' . prettyRender($children, $depth + 1);
                 break;
         }
     }, $ast);
@@ -39,6 +39,9 @@ function prettyRender($ast, $indentSize = 0)
 
 function dataToString($data, $indent)
 {
+    if (empty($data)) {
+        return null;
+    }
     if (is_array($data)) {
         $keys = array_keys($data);
         $result = array_reduce($keys, function ($acc, $key) use ($data, $indent) {

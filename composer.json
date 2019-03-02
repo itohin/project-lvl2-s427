@@ -25,7 +25,8 @@
             "src/Parser.php",
             "src/Renderers/Render.php",
             "src/Renderers/PrettyRender.php",
-            "src/Renderers/PlainRender.php"
+            "src/Renderers/PlainRender.php",
+            "src/Renderers/JsonRender.php"
         ]
     },
     "require": {
