@@ -10,8 +10,8 @@ function prettyRender($ast, $depth = 0)
 
         $type = $node['type'];
         $key = $node['key'];
-        $oldValue = is_bool($node['oldValue']) ? var_export($node['oldValue'], 1) : $node['oldValue'];
-        $newValue = is_bool($node['newValue']) ? var_export($node['newValue'], 1) : $node['newValue'];
+        $oldValue = booleanToString($node['oldValue']);
+        $newValue = booleanToString($node['newValue']);
         $children = $node['children'];
 
         switch ($type) {
@@ -42,7 +42,11 @@ function dataToString($data, $indent)
     if (empty($data)) {
         return null;
     }
-    if (is_array($data)) {
+
+    if (!is_array($data)) {
+        return $data;
+    }
+
         $keys = array_keys($data);
         $result = array_reduce($keys, function ($acc, $key) use ($data, $indent) {
             $acc[] = '        ' . $indent . $key . ': ' . $data[$key];
@@ -50,7 +54,9 @@ function dataToString($data, $indent)
         }, []);
         $string = implode(PHP_EOL, $result) . PHP_EOL;
         return '{' . PHP_EOL . $string . $indent . '    }';
-    } else {
-        return $data;
-    }
+}
+
+function booleanToString($item)
+{
+    return is_bool($item) ? var_export($item, 1) : $item;
 }

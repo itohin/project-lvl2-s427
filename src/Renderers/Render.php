@@ -7,11 +7,15 @@ use function Gendiff\Renderers\jsonRender;
 
 function render($ast, $format)
 {
-    if ($format === 'pretty') {
-        return prettyRender($ast);
-    } elseif ($format === 'plain') {
-        return plainRender($ast);
-    } elseif ($format === 'json') {
-        return jsonRender($ast);
+    switch ($format) {
+        case 'pretty':
+            return prettyRender($ast);
+            break;
+        case 'plain':
+            return plainRender($ast);
+            break;
+        case 'json':
+            return jsonRender($ast);
+            break;
     }
 }

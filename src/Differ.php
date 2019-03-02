@@ -19,8 +19,8 @@ function createAst($dataBefore, $dataAfter)
 {
     $keys = array_unique(array_merge(array_keys($dataBefore), array_keys($dataAfter)));
     return array_reduce($keys, function ($acc, $key) use ($dataBefore, $dataAfter) {
-        $firstValue = isset($dataBefore[$key]) ? $dataBefore[$key] : null;
-        $secondValue = isset($dataAfter[$key]) ? $dataAfter[$key] : null;
+        $firstValue = $dataBefore[$key] ?? null;
+        $secondValue = $dataAfter[$key] ?? null;
 
         if (array_key_exists($key, $dataBefore) && array_key_exists($key, $dataAfter)) {
             if (is_array($firstValue) && is_array($secondValue)) {

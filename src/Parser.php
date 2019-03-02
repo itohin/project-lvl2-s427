@@ -8,7 +8,7 @@ function getData($filepath)
     $type = pathinfo($filepath, PATHINFO_EXTENSION);
     $data = file_get_contents($filepath);
 
-    $parser = parser($type, $data);
+    $parser = parse($type, $data);
 
     return $parser;
 }
@@ -23,7 +23,7 @@ function parseYaml($data)
     return Yaml::parse($data);
 }
 
-function parser($type, $data)
+function parse($type, $data)
 {
     if ($type === 'json') {
         return parseJson($data);
