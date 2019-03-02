@@ -4,18 +4,18 @@ namespace Gendiff\Renderers;
 
 function renderJson($ast)
 {
-    $filteredAst = array_filter_recursive($ast);
+    $filteredAst = astFilter($ast);
     return json_encode($filteredAst, JSON_PRETTY_PRINT + JSON_NUMERIC_CHECK);
 }
 
-function array_filter_recursive($array)
+function astFilter($ast)
 {
-    $array = array_filter($array);
-    foreach ($array as &$value) {
-        if (is_array($value)) {
-            $value = array_filter_recursive($value);
+    $ast = array_filter($ast);
+    foreach ($ast as &$node) {
+        if (is_array($node)) {
+            $node = astFilter($node);
         }
     }
 
-    return $array;
+    return $ast;
 }
