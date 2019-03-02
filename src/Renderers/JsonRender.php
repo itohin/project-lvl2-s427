@@ -2,7 +2,7 @@
 
 namespace Gendiff\Renderers;
 
-function jsonRender($ast)
+function renderJson($ast)
 {
     $filteredAst = array_filter_recursive($ast);
     return json_encode($filteredAst, JSON_PRETTY_PRINT + JSON_NUMERIC_CHECK);

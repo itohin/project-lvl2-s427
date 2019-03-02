@@ -2,7 +2,7 @@
 
 namespace Gendiff\Renderers;
 
-function plainRender($data, $parent = null)
+function renderPlain($data, $parent = null)
 {
     $result = array_map(function ($node) use ($parent) {
         $type = $node['type'];
@@ -12,7 +12,8 @@ function plainRender($data, $parent = null)
         $newValue = is_array($newValue) ? "complex value" : $newValue;
         $children = $node['children'];
 
-        $fullKey = $parent ? "'{$parent}.{$key}'" : "'{$key}'";
+        $fullKey = "'{$parent}{$key}'";
+        $parentKey = "{$key}.";
 
         switch ($type) {
             case 'changed':
@@ -25,7 +26,7 @@ function plainRender($data, $parent = null)
                 return "Property {$fullKey} was added with value: '{$newValue}'";
                 break;
             case 'node':
-                return plainRender($children, $key);
+                return renderPlain($children, $parentKey);
                 break;
         }
     }, $data);

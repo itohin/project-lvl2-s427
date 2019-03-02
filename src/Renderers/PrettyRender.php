@@ -2,7 +2,7 @@
 
 namespace Gendiff\Renderers;
 
-function prettyRender($ast, $depth = 0)
+function renderPretty($ast, $depth = 0)
 {
     $indent = str_repeat('    ', $depth);
 
@@ -29,7 +29,7 @@ function prettyRender($ast, $depth = 0)
                 return $indent . '  + ' . $key . ': ' . dataToString($newValue, $indent);
                 break;
             case 'node':
-                return $indent . '    ' . $key . ': ' . prettyRender($children, $depth + 1);
+                return $indent . '    ' . $key . ': ' . renderPretty($children, $depth + 1);
                 break;
         }
     }, $ast);

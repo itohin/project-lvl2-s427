@@ -1,21 +1,21 @@
 <?php
 
 namespace Gendiff\Renderers;
-use function Gendiff\Renderers\prettyRender;
-use function Gendiff\Renderers\plainRender;
-use function Gendiff\Renderers\jsonRender;
+use function Gendiff\Renderers\renderPretty;
+use function Gendiff\Renderers\renderPlain;
+use function Gendiff\Renderers\renderJson;
 
 function render($ast, $format)
 {
     switch ($format) {
         case 'pretty':
-            return prettyRender($ast);
+            return renderPretty($ast);
             break;
         case 'plain':
-            return plainRender($ast);
+            return renderPlain($ast);
             break;
         case 'json':
-            return jsonRender($ast);
+            return renderJson($ast);
             break;
     }
 }
