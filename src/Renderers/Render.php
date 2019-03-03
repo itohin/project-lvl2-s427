@@ -10,12 +10,9 @@ function render($ast, $format)
     switch ($format) {
         case 'pretty':
             return renderPretty($ast);
-            break;
         case 'plain':
             return renderPlain($ast);
-            break;
         case 'json':
             return renderJson($ast);
-            break;
     }
 }

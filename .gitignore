@@ -3,3 +3,4 @@
 .DS_Store
 before.json
 after.json
+.phpunit.result.cache
